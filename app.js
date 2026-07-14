@@ -159,19 +159,8 @@ function renderAlignmentStrip(){
     if(isSCP) html += `<text x="${mx}" y="${yMain-9}" text-anchor="middle" font-family="IBM Plex Mono" font-size="7.5" fill="${SCP}" font-weight="700">SCP</text>`;
   }
 
-  // ── tie-in บนแนวประธาน (ติดบ่อ ไม่มีระยะ) ──
-  net.mainSubs.forEach(su=>{
-    const cx0=X[su.at]; if(cx0==null) return;
-    if(su.side==="left"){
-      const cx=cx0-sq/2-sqSub/2;
-      html+=wellRect(cx,yMain,sqSub,SUB_FILL,"sub",su.w+" · ตัดบรรจบ",null);
-      html+=`<text x="${cx-sqSub/2-2}" y="${yMain+3}" text-anchor="end" font-family="IBM Plex Mono" font-size="7" fill="${SUB_INK}">${su.w}</text>`;
-    } else {
-      const cy=yMain+sq/2+sqSub/2;
-      html+=wellRect(cx0,cy,sqSub,SUB_FILL,"sub",su.w+" · ตัดบรรจบ",null);
-      html+=`<text x="${cx0+sqSub/2+3}" y="${cy+3}" font-family="IBM Plex Mono" font-size="7" fill="${SUB_INK}">${su.w}</text>`;
-    }
-  });
+  // ── tie-in บนแนวประธาน: ไม่วาดสี่เหลี่ยม (เลี่ยงสับสนกับสีเหลือง Test Pit) — คงข้อมูลไว้ใน DATA.network ──
+
 
   // ── branch ฝั่งขาออก (SCP ข้ามถนน ≈40 ม.) ──
   net.branches.forEach(br=>{
@@ -181,18 +170,13 @@ function renderAlignmentStrip(){
     html+=`<text x="${cx+5}" y="${(yMain+yBranch)/2+2}" font-family="IBM Plex Mono" font-size="7.5" fill="${SCP}" font-weight="700">SCP</text>`;
     html+=wellRect(cx,yBranch,sq,color,br.type,br.w+" · "+br.size+" · "+stageLabel(wellStatus(br.w)),br.w);
     html+=`<text x="${cx}" y="${yBranch-sq/2-6}" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" font-weight="700" fill="var(--navy)">${br.w.replace('MH.','')}</text>`;
-    (br.subFlush||[]).forEach((sw,idx)=>{
-      const sx=cx+sq/2+sqSub/2+idx*(sqSub+1);
-      html+=wellRect(sx,yBranch,sqSub,SUB_FILL,"sub",sw+" · ตัดบรรจบ",null);
-      html+=`<text x="${sx}" y="${yBranch+sqSub/2+10}" text-anchor="middle" font-family="IBM Plex Mono" font-size="7" fill="${SUB_INK}">${sw.replace('MH.','')}</text>`;
-    });
+    // tie-in ข้างบ่อ branch: ไม่วาดสี่เหลี่ยม (เลี่ยงสับสนกับสีเหลือง Test Pit)
     if(br.open){
       const oLen=toPx(br.open.len);
-      const ox=cx-sq/2-oLen-sqSub/2;
-      html+=`<line x1="${cx-sq/2}" y1="${yBranch}" x2="${ox+sqSub/2}" y2="${yBranch}" stroke="${OPEN_INK}" stroke-width="2.8" stroke-dasharray="1.5 2.5"/>`;
+      const ox=cx-sq/2-oLen;
+      html+=`<line x1="${cx-sq/2}" y1="${yBranch}" x2="${ox}" y2="${yBranch}" stroke="${OPEN_INK}" stroke-width="2.8" stroke-dasharray="1.5 2.5"/>`;
+      html+=`<circle cx="${ox}" cy="${yBranch}" r="2.6" fill="${OPEN_INK}"><title>${br.open.w} · ตัดบรรจบ (ปลายงานขุดเปิด)</title></circle>`;
       html+=`<text x="${(cx-sq/2+ox)/2}" y="${yBranch-8}" text-anchor="middle" font-family="IBM Plex Sans Thai" font-size="7.5" fill="${OPEN_INK}" font-weight="600">ขุดเปิด ${br.open.len}ม.</text>`;
-      html+=wellRect(ox,yBranch,sqSub,SUB_FILL,"sub",br.open.w+" · ตัดบรรจบ",null);
-      html+=`<text x="${ox}" y="${yBranch+sqSub/2+10}" text-anchor="middle" font-family="IBM Plex Mono" font-size="7" fill="${SUB_INK}">${br.open.w.replace('MH.','')}</text>`;
     }
   });
 
